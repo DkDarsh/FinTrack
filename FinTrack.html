@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack - Expense Tracker</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#090d16] min-h-screen text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- Custom Notification Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-slate-900 border border-slate-800/80 rounded-3xl p-6 max-w-sm w-full shadow-2xl transform transition-all">
+            <h3 id="modal-title" class="text-base font-bold text-slate-100 mb-2">Notification</h3>
+            <p id="modal-message" class="text-slate-400 text-sm mb-5 leading-relaxed">Message goes here.</p>
+            <button onclick="closeModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 px-4 rounded-2xl transition duration-200 shadow-lg shadow-emerald-600/25">Got it</button>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-[#0b101b]/80 backdrop-blur-xl border-b border-slate-800/60 sticky top-0 z-40">
+        <div class="max-w-md mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-gradient-to-tr from-emerald-600 to-teal-500 text-white p-2.5 rounded-2xl shadow-lg shadow-emerald-600/30">
+                    <i class="fa-solid fa-wallet text-base"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-base tracking-tight text-slate-100 block leading-none">FinTrack</span>
+                    <span class="text-[10px] text-emerald-400 font-medium tracking-wide uppercase">Expense Manager</span>
+                </div>
+            </div>
+            <div id="user-info" class="hidden flex items-center space-x-2.5">
+                <span id="user-email-display" class="text-xs text-slate-400 font-medium truncate max-w-[100px] hidden sm:inline"></span>
+                <button onclick="logout()" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium px-3 py-2 rounded-xl transition border border-slate-800 shadow-sm flex items-center">
+                    <i class="fa-solid fa-right-from-bracket mr-1.5 text-rose-400"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto w-full p-4 flex-grow flex flex-col justify-center">
+
+        <!-- AUTHENTICATION VIEW -->
+        <div id="auth-section" class="bg-[#111726] rounded-3xl shadow-2xl border border-slate-800/70 p-6 sm:p-7 my-auto">
+            <div class="text-center mb-6">
+                <div class="inline-flex bg-emerald-500/10 text-emerald-400 p-3 rounded-2xl mb-3 border border-emerald-500/20">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <h1 id="auth-form-title" class="text-xl font-bold text-slate-100">Welcome to FinTrack</h1>
+                <p id="auth-form-subtitle" class="text-slate-400 text-xs mt-1 leading-relaxed">Sign in with your email to securely track your expenses in ₹</p>
+            </div>
+
+            <!-- Tabs for Login / Signup -->
+            <div class="flex bg-[#090d16] p-1.5 rounded-2xl mb-6 border border-slate-800/60">
+                <button id="tab-login" onclick="switchTab('login')" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-emerald-400 shadow-sm transition">Login</button>
+                <button id="tab-signup" onclick="switchTab('signup')" class="flex-1 py-2 text-xs font-semibold rounded-xl text-slate-400 transition hover:text-slate-200">Sign Up</button>
+            </div>
+
+            <!-- Form -->
+            <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Email Address</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                            <i class="fa-regular fa-envelope"></i>
+                        </span>
+                        <input type="email" id="email" required placeholder="name@example.com" class="w-full pl-10 pr-4 py-3 bg-[#090d16] border border-slate-800 rounded-2xl text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-[#090d16] border border-slate-800 rounded-2xl text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition">
+                    </div>
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 rounded-2xl transition duration-200 shadow-xl shadow-emerald-600/20 text-xs uppercase tracking-wider mt-2">
+                    Sign In
+                </button>
+            </form>
+        </div>
+
+        <!-- APP DASHBOARD VIEW (Hidden until login) -->
+        <div id="app-section" class="hidden space-y-4 my-auto">
+            <!-- Balance Card -->
+            <div class="bg-gradient-to-br from-emerald-600 via-teal-700 to-slate-900 rounded-3xl p-6 text-white shadow-2xl shadow-emerald-950/60 relative overflow-hidden border border-emerald-500/20">
+                <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <p class="text-emerald-100/70 text-[11px] font-bold uppercase tracking-widest">Total Balance</p>
+                <h2 id="total-balance" class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">₹0.00</h2>
+                
+                <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-emerald-400/20">
+                    <div class="bg-black/10 backdrop-blur-sm p-3 rounded-2xl border border-white/5">
+                        <div class="flex items-center space-x-1.5 text-emerald-200/80 text-[10px] font-semibold uppercase tracking-wider mb-0.5">
+                            <i class="fa-solid fa-arrow-down-left text-[9px]"></i>
+                            <span>Income</span>
+                        </div>
+                        <p id="total-income" class="text-base sm:text-lg font-bold text-white">₹0.00</p>
+                    </div>
+                    <div class="bg-black/10 backdrop-blur-sm p-3 rounded-2xl border border-white/5">
+                        <div class="flex items-center space-x-1.5 text-rose-200/80 text-[10px] font-semibold uppercase tracking-wider mb-0.5">
+                            <i class="fa-solid fa-arrow-up-right text-[9px]"></i>
+                            <span>Expense</span>
+                        </div>
+                        <p id="total-expense" class="text-base sm:text-lg font-bold text-white">₹0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Transaction Form -->
+            <div class="bg-[#111726] rounded-3xl shadow-xl border border-slate-800/70 p-5">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3.5 flex items-center">
+                    <i class="fa-solid fa-circle-plus text-emerald-400 mr-2 text-sm"></i> New Transaction
+                </h3>
+                <form onsubmit="addTransaction(event)" class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <input type="text" id="tx-desc" required placeholder="What was this for?" class="w-full px-3.5 py-2.5 bg-[#090d16] border border-slate-800 rounded-2xl text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                        </div>
+                        <div>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 text-xs font-bold">₹</span>
+                                <input type="number" step="0.01" id="tx-amount" required placeholder="Amount" class="w-full pl-8 pr-3.5 py-2.5 bg-[#090d16] border border-slate-800 rounded-2xl text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex space-x-4 bg-[#090d16] px-3 py-1.5 rounded-2xl border border-slate-800/80">
+                            <label class="flex items-center text-[11px] font-semibold text-slate-300 cursor-pointer">
+                                <input type="radio" name="tx-type" value="income" checked class="mr-1.5 accent-emerald-500"> Income
+                            </label>
+                            <label class="flex items-center text-[11px] font-semibold text-slate-300 cursor-pointer">
+                                <input type="radio" name="tx-type" value="expense" class="mr-1.5 accent-emerald-500"> Expense
+                            </label>
+                        </div>
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-2xl text-xs font-bold transition shadow-lg shadow-emerald-600/20">
+                            Add Entry
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Transactions History -->
+            <div class="bg-[#111726] rounded-3xl shadow-xl border border-slate-800/70 p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Recent Activity</h3>
+                    <span class="text-[10px] text-slate-500 font-medium">Live Sync</span>
+                </div>
+                <div id="transactions-list" class="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-500 text-center py-6">No transactions recorded yet.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 text-[11px] text-slate-500 border-t border-slate-900/60">
+        FinTrack &bull; Secured with Firebase &hearts;
+    </footer>
+
+    <!-- Firebase SDK Imports (Modular v11) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your specific Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCHw1pqNBp_NWVrYWi3pMmNuf1evIXj8nE",
+            authDomain: "fintrack-2091d.firebaseapp.com",
+            projectId: "fintrack-2091d",
+            storageBucket: "fintrack-2091d.firebasestorage.app",
+            messagingSenderId: "721465834725",
+            appId: "1:721465834725:web:da300e3a9fb5615db5680c",
+            measurementId: "G-5S0Q0M2D46"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'fintrack-default';
+
+        // Initialize Firebase services
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase initialization failed. Make sure valid configuration exists.", e);
+        }
+
+        let currentMode = 'login'; // 'login' or 'signup'
+        let unsubscribeTransactions = null;
+
+        window.switchTab = function(mode) {
+            currentMode = mode;
+            const loginTab = document.getElementById('tab-login');
+            const signupTab = document.getElementById('tab-signup');
+            const title = document.getElementById('auth-form-title');
+            const subtitle = document.getElementById('auth-form-subtitle');
+            const btn = document.getElementById('auth-submit-btn');
+
+            if (mode === 'login') {
+                loginTab.className = "flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-emerald-400 shadow-sm transition";
+                signupTab.className = "flex-1 py-2 text-xs font-semibold rounded-xl text-slate-400 transition hover:text-slate-200";
+                title.innerText = "Welcome Back";
+                subtitle.innerText = "Sign in with your email to securely track your expenses in ₹";
+                btn.innerText = "Sign In";
+            } else {
+                signupTab.className = "flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-emerald-400 shadow-sm transition";
+                loginTab.className = "flex-1 py-2 text-xs font-semibold rounded-xl text-slate-400 transition hover:text-slate-200";
+                title.innerText = "Create Account";
+                subtitle.innerText = "Sign up using your email to start tracking in ₹";
+                btn.innerText = "Sign Up";
+            }
+        }
+
+        window.handleAuth = async function(event) {
+            event.preventDefault();
+            if (!auth) {
+                showModal("Configuration Error", "Firebase is not initialized properly.");
+                return;
+            }
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                if (currentMode === 'login') {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                showModal("Authentication Error", error.message);
+            }
+        }
+
+        window.logout = async function() {
+            if (auth) {
+                await signOut(auth);
+            }
+        }
+
+        // Auth state listener
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                const authSection = document.getElementById('auth-section');
+                const appSection = document.getElementById('app-section');
+                const userInfo = document.getElementById('user-info');
+                const userEmailDisplay = document.getElementById('user-email-display');
+
+                if (user) {
+                    authSection.classList.add('hidden');
+                    appSection.classList.remove('hidden');
+                    userInfo.classList.remove('hidden');
+                    userEmailDisplay.innerText = user.email;
+
+                    // Listen to user data collection
+                    loadUserTransactions(user.uid);
+                } else {
+                    authSection.classList.remove('hidden');
+                    appSection.classList.add('hidden');
+                    userInfo.classList.add('hidden');
+                    
+                    if (unsubscribeTransactions) {
+                        unsubscribeTransactions();
+                        unsubscribeTransactions = null;
+                    }
+                }
+            });
+        }
+
+        // Add Transaction Data to Firestore
+        window.addTransaction = async function(event) {
+            event.preventDefault();
+            if (!auth || !auth.currentUser) return;
+
+            const desc = document.getElementById('tx-desc').value;
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const type = document.querySelector('input[name="tx-type"]:checked').value;
+
+            try {
+                const userColRef = collection(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'transactions');
+                await addDoc(userColRef, {
+                    description: desc,
+                    amount: amount,
+                    type: type,
+                    timestamp: Date.now()
+                });
+
+                document.getElementById('tx-desc').value = '';
+                document.getElementById('tx-amount').value = '';
+            } catch (error) {
+                showModal("Database Error", "Failed to save transaction: " + error.message);
+            }
+        }
+
+        // Fetch User Transactions in Real-Time
+        function loadUserTransactions(userId) {
+            const userColRef = collection(db, 'artifacts', appId, 'users', userId, 'transactions');
+            
+            unsubscribeTransactions = onSnapshot(userColRef, (snapshot) => {
+                let transactions = [];
+                snapshot.forEach(doc => {
+                    transactions.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort descending by timestamp
+                transactions.sort((a, b) => b.timestamp - a.timestamp);
+
+                updateDashboardUI(transactions);
+            }, (error) => {
+                console.error("Error fetching transactions:", error);
+            });
+        }
+
+        // Render Dashboard Metrics & List
+        function updateDashboardUI(transactions) {
+            let totalIncome = 0;
+            let totalExpense = 0;
+            const listEl = document.getElementById('transactions-list');
+
+            if (transactions.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No transactions recorded yet.</p>`;
+            } else {
+                listEl.innerHTML = '';
+                transactions.forEach(tx => {
+                    if (tx.type === 'income') {
+                        totalIncome += tx.amount;
+                    } else {
+                        totalExpense += tx.amount;
+                    }
+
+                    const item = document.createElement('div');
+                    item.className = "flex items-center justify-between p-3 bg-[#090d16] border border-slate-800/80 rounded-2xl text-xs";
+                    item.innerHTML = `
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-8 h-8 rounded-xl flex items-center justify-center ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                                <i class="fa-solid ${tx.type === 'income' ? 'fa-arrow-down-left' : 'fa-arrow-up-right'} text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-200 text-xs">${escapeHtml(tx.description)}</p>
+                                <p class="text-[10px] text-slate-500 mt-0.5">${new Date(tx.timestamp).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <span class="font-bold text-xs ${tx.type === 'income' ? 'text-emerald-400' : 'text-slate-100'}">
+                            ${tx.type === 'income' ? '+' : '-'}₹${tx.amount.toFixed(2)}
+                        </span>
+                    `;
+                    listEl.appendChild(item);
+                });
+            }
+
+            const balance = totalIncome - totalExpense;
+            document.getElementById('total-balance').innerText = `₹${balance.toFixed(2)}`;
+            document.getElementById('total-income').innerText = `₹${totalIncome.toFixed(2)}`;
+            document.getElementById('total-expense').innerText = `₹${totalExpense.toFixed(2)}`;
+        }
+
+        // Helper utilities
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        window.showModal = function(title, message) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
