@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pro Budget Tracker</title>
+    <title>FinTrack</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -149,11 +149,12 @@
             <form id="form" class="flex flex-col gap-2.5 max-w-4xl mx-auto w-full">
                 <div class="flex gap-3">
                     <select id="category" class="w-1/2 sm:w-2/5 px-3 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm font-semibold shadow-sm appearance-none">
+                        <option value="Money Received">Money Received</option>
                         <option value="Food & Drinks">Food & Drinks</option>
                         <option value="Transport">Transport</option>
                         <option value="Shopping">Shop</option>
                         <option value="Bills">Bills</option>
-                        <option value="Money Received">Money Received</option>
+                        
                     </select>
                     <div class="flex-1 relative shadow-sm rounded-xl">
                         <input type="text" id="text" placeholder="Description..." class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all text-sm placeholder-slate-400">
@@ -333,11 +334,12 @@
         }
 
         const categoryIcons = {
+            'Money Received': '<i class="fa-solid fa-hand-holding-dollar text-emerald-500"></i>'
             'Food & Drinks': '<i class="fa-solid fa-burger text-orange-500"></i>',
             'Transport': '<i class="fa-solid fa-car text-blue-500"></i>',
             'Shopping': '<i class="fa-solid fa-bag-shopping text-pink-500"></i>',
             'Bills': '<i class="fa-solid fa-bolt text-yellow-500"></i>',
-            'Money Received': '<i class="fa-solid fa-hand-holding-dollar text-emerald-500"></i>'
+            
         };
 
         function addTransactionDOM(transaction) {
@@ -440,13 +442,13 @@
             const credit = amounts.filter(item => item > 0).reduce((acc, item) => (acc += item), 0);
             const debit = amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1;
 
-            let text = `📊 *FINANCIAL SUMMARY STATEMENT* 📊\n`;
+            let text = `FINANCIAL SUMMARY STATEMENT \n`;
             text += `----------------------------------------\n`;
             text += `• Total Balance: ₹${formatRupees(total)}\n`;
             text += `• Total Credit (+): ₹${formatRupees(credit)}\n`;
             text += `• Total Debit (-): ₹${formatRupees(debit)}\n`;
             text += `----------------------------------------\n`;
-            text += `📝 *TRANSACTION HISTORY*:\n`;
+            text += `TRANSACTION HISTORY:\n`;
 
             if (transactions.length === 0) {
                 text += `(No transactions recorded yet)\n`;
