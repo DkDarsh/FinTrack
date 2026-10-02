@@ -7,8 +7,6 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
@@ -50,7 +48,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex justify-center items-center min-h-screen m-0 p-0 transition-colors duration-300">
 
-    <div class="w-full h-[100dvh] md:h-[100vh] shadow-none md:shadow-xl overflow-hidden flex flex-col bg-white dark:bg-slate-900 relative border-0 md:border border-slate-200 dark:border-slate-800 transition-colors duration-300 max-w-2xl mx-auto">
+    <div class="w-full h-[100dvh] md:h-[100vh] shadow-none md:shadow-xl overflow-hidden flex flex-col bg-white dark:bg-slate-900 relative border-0 md:border border-slate-200 dark:border-slate-800 transition-colors duration-300">
         
         <div class="absolute top-16 right-6 z-[60]">
             <div id="action-menu" class="hidden w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-2 overflow-hidden text-slate-700 dark:text-slate-200 animate-fade-in origin-top-right">
@@ -60,11 +58,7 @@
                 <button onclick="openInsights(); closeMenu()" class="w-full text-left px-4 py-2 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors"><i class="fa-solid fa-chart-pie w-4 text-indigo-500"></i> Insights</button>
                 <button onclick="openWrapped(); closeMenu()" class="w-full text-left px-4 py-2 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors"><i class="fa-solid fa-gift w-4 text-indigo-500"></i> FinTrack Wrapped</button>
                 <button onclick="openAIAdvisor(); closeMenu()" class="w-full text-left px-4 py-2 text-sm font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center gap-3 transition-colors"><i class="fa-solid fa-wand-magic-sparkles w-4"></i> FinAI Advisor</button>
-                
                 <div class="h-px bg-slate-200 dark:bg-slate-700 my-1 mx-2"></div>
-                
-                <button onclick="openCurrencyModal(); closeMenu()" class="w-full text-left px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors"><i class="fa-solid fa-coins w-4"></i> Currency</button>
-                <button onclick="exportToPDF(); closeMenu()" class="w-full text-left px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors"><i class="fa-solid fa-file-pdf w-4"></i> Export PDF</button>
                 <button onclick="openShareSheet(); closeMenu()" class="w-full text-left px-4 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors"><i class="fa-solid fa-share-nodes w-4"></i> Share</button>
             </div>
         </div>
@@ -163,12 +157,10 @@
 
     <div id="add-transaction-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[90vh] overflow-y-auto relative">
-            
             <div id="ai-loading-overlay" class="absolute inset-0 bg-white/90 dark:bg-slate-800/90 z-10 hidden flex-col items-center justify-center rounded-xl">
                 <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-500 mb-3"></i>
                 <p class="text-sm font-medium text-slate-800 dark:text-slate-200" id="ai-loading-text">Scanning receipt...</p>
             </div>
-
             <div class="flex justify-between items-center mb-6">
                 <h3 id="transaction-modal-title" class="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                     New Transaction
@@ -197,17 +189,14 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Description</label>
                     <input type="text" id="text" placeholder="What was this for?" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm placeholder-slate-400">
                 </div>
-
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Tags (Optional)</label>
                     <input type="text" id="tags" placeholder="e.g. coffee, wishlist (comma separated)" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm placeholder-slate-400">
                 </div>
-
                 <div class="flex gap-3">
                     <div class="w-1/2 flex flex-col gap-1.5">
                         <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Amount</label>
@@ -221,7 +210,6 @@
                         <input type="date" id="transaction-date" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm">
                     </div>
                 </div>
-
                 <button type="submit" id="transaction-submit-btn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center gap-2 text-sm">
                     Save Transaction
                 </button>
@@ -251,42 +239,6 @@
                     Delete
                 </button>
             </div>
-        </div>
-    </div>
-
-    <div id="currency-modal" class="fixed inset-0 z-[55] bg-slate-900/50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-xl max-w-sm w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    Currency Settings
-                </h3>
-                <button onclick="closeCurrencyModal()" class="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
-            </div>
-            
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-2">Active Currency for New Transactions</p>
-            <select id="currency-select" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm mb-4">
-            </select>
-            <button onclick="saveCurrency()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors text-sm mb-4">
-                Set as Active
-            </button>
-            
-            <div class="my-3 flex items-center gap-3">
-                <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
-                <span class="text-xs font-semibold text-slate-400">ADD CUSTOM</span>
-                <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
-            </div>
-
-            <form onsubmit="addCustomCurrency(event)" class="flex flex-col gap-3 mt-2">
-                <div class="flex gap-2">
-                    <input type="text" id="custom-curr-code" placeholder="Code (e.g. AUD)" required maxlength="5" class="w-1/2 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm uppercase">
-                    <input type="text" id="custom-curr-sym" placeholder="Symbol (e.g. $)" required maxlength="3" class="w-1/2 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                </div>
-                <button type="submit" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-2 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-600">
-                    Add Currency
-                </button>
-            </form>
         </div>
     </div>
 
@@ -353,18 +305,15 @@
     <div id="add-category-modal" class="fixed inset-0 z-[55] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-sm w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 shrink-0">Manage Categories</h3>
-            
             <form onsubmit="saveCustomCategory(event)" class="flex flex-col gap-3 shrink-0 mb-4">
                 <input type="text" id="new-cat-name" placeholder="New Category Name" required class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-colors text-sm">Add Category</button>
             </form>
-
             <div class="flex-1 overflow-y-auto min-h-0">
                 <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Custom Categories</p>
                 <ul id="custom-categories-list" class="space-y-2">
                 </ul>
             </div>
-            
             <button type="button" onclick="closeAddCategoryModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium py-2 rounded-lg transition-colors text-sm mt-4 shrink-0 border border-slate-200 dark:border-slate-600">Done</button>
         </div>
     </div>
@@ -393,7 +342,6 @@
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
-            
             <div class="flex gap-4 mb-6">
                 <div class="flex-1 bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg border border-slate-200 dark:border-slate-600 text-center">
                     <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">Top Expense</p>
@@ -404,7 +352,6 @@
                     <p id="total-expense-amount" class="text-sm font-bold text-rose-600 dark:text-rose-400">-</p>
                 </div>
             </div>
-
             <div class="relative flex-1 min-h-[250px] w-full">
                 <canvas id="insightsChart"></canvas>
             </div>
@@ -421,7 +368,6 @@
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
-
             <div id="budgets-list-container" class="flex flex-col flex-1 min-h-0">
                 <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Track your spending limits for the current month.</p>
                 <ul id="budgets-list" class="space-y-3 overflow-y-auto pr-1 flex-1 pb-4">
@@ -430,7 +376,6 @@
                     <i class="fa-solid fa-plus"></i> Set New Budget
                 </button>
             </div>
-
             <div id="add-budget-form-container" class="hidden flex flex-col">
                 <form id="new-budget-form" onsubmit="saveNewBudget(event)" class="flex flex-col gap-3">
                     <input type="hidden" id="edit-budget-id" value="">
@@ -546,22 +491,13 @@
             transactions: []
         };
 
-        appData.settings = appData.settings || { currency: 'INR' };
         appData.customCategories = appData.customCategories || [];
         appData.goals = appData.goals || [];
         appData.budgets = appData.budgets || [];
-        appData.customCurrencies = appData.customCurrencies || [];
-
-        const defaultCurrencies = [
-            { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-            { code: 'USD', symbol: '$', name: 'US Dollar' },
-            { code: 'EUR', symbol: '€', name: 'Euro' },
-            { code: 'GBP', symbol: '£', name: 'British Pound' }
-        ];
 
         const oldTransactions = JSON.parse(localStorage.getItem('transactions'));
         if (oldTransactions && oldTransactions.length > 0 && (!appData.transactions || appData.transactions.length === 0)) {
-            appData.transactions = oldTransactions.map(t => ({...t, accountId: DEFAULT_ACCOUNT_ID, currencyCode: 'INR', currencySymbol: '₹'}));
+            appData.transactions = oldTransactions.map(t => ({...t, accountId: DEFAULT_ACCOUNT_ID}));
             localStorage.removeItem('transactions');
             updateLocalStorage();
         }
@@ -663,7 +599,7 @@
                 let replyText = "I'm your offline FinAI! I can help summarize your spending, predict trends, or find ways to save. Try asking 'summary'.";
                 
                 const currentTxns = getCurrentTransactions();
-                const sym = getCurrencySymbol();
+                const sym = '₹';
                 const balance = document.getElementById('balance').innerText;
 
                 if (lowerText.includes('summary')) {
@@ -809,15 +745,7 @@
             return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
         }
 
-        function getCurrencySymbol(code) {
-            if (!code) code = appData.settings.currency || 'INR';
-            
-            const def = defaultCurrencies.find(c => c.code === code);
-            if (def) return def.symbol;
-
-            const custom = appData.customCurrencies.find(c => c.code === code);
-            if (custom) return custom.symbol;
-
+        function getCurrencySymbol() {
             return '₹';
         }
 
@@ -953,7 +881,7 @@
             const txn = appData.transactions.find(t => t.id === id);
             if (!txn) return;
             
-            const sym = txn.currencySymbol || getCurrencySymbol(txn.currencyCode);
+            const sym = '₹';
             const isCredit = txn.amount > 0;
             const contentEl = document.getElementById('view-transaction-content');
             
@@ -1046,8 +974,6 @@
 
             hideToast();
 
-            const currentCurrCode = appData.settings.currency || 'INR';
-
             if (editId) {
                 const txn = appData.transactions.find(t => t.id == editId);
                 if (txn) {
@@ -1066,9 +992,7 @@
                     amount: type === 'debit' ? -Math.abs(amount) : Math.abs(amount),
                     category: category,
                     date: customDate ? customDate : new Date().toISOString().split('T')[0],
-                    tags: tags,
-                    currencyCode: currentCurrCode,
-                    currencySymbol: getCurrencySymbol(currentCurrCode)
+                    tags: tags
                 };
                 appData.transactions.push(transaction);
                 showToast("Transaction saved", 'success');
@@ -1120,7 +1044,7 @@
             const sign = isCredit ? '+' : '-';
             const iconStr = getCategoryIcon(transaction.category);
             
-            const txSymbol = transaction.currencySymbol || getCurrencySymbol(transaction.currencyCode || appData.settings.currency);
+            const txSymbol = '₹';
 
             let tagsHTML = '';
             if (transaction.tags && transaction.tags.length > 0) {
@@ -1373,95 +1297,6 @@
             });
         }
 
-        function exportToPDF() {
-            const currentTxns = getCurrentTransactions();
-            if (currentTxns.length === 0) {
-                showToast("No data to export for this account!", 'error');
-                return;
-            }
-            
-            if (!window.jspdf || !window.jspdf.jsPDF) {
-                showToast("PDF generator loading, please wait...", 'error');
-                return;
-            }
-            
-            const accountName = appData.accounts.find(a => a.id === appData.currentAccountId)?.name || 'Account';
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFontSize(22);
-            doc.setTextColor(124, 58, 237);
-            doc.text(`FinTrack Statement`, 14, 22);
-            
-            doc.setFontSize(11);
-            doc.setTextColor(100);
-            doc.text(`Account: ${accountName}`, 14, 32);
-            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 38);
-
-            const tableBody = currentTxns.sort((a, b) => new Date(b.date) - new Date(a.date)).map(t => {
-                const type = t.amount > 0 ? "Credit" : "Debit";
-                const txSym = t.currencySymbol || getCurrencySymbol(t.currencyCode);
-                const tags = t.tags && t.tags.length > 0 ? t.tags.map(tag=>'#'+tag).join(' ') : '';
-                return [
-                    formatDate(t.date),
-                    t.text + (tags ? `\n${tags}` : ''),
-                    t.category,
-                    type,
-                    `${txSym}${formatRupees(Math.abs(t.amount))}`
-                ];
-            });
-
-            doc.autoTable({
-                startY: 45,
-                head: [['Date', 'Description', 'Category', 'Type', 'Amount']],
-                body: tableBody,
-                theme: 'grid',
-                headStyles: { fillColor: [124, 58, 237] },
-                styles: { fontSize: 9, cellPadding: 4 },
-            });
-
-            const filename = `FinTrack_${accountName.replace(/\s+/g, '_')}_Statement.pdf`;
-            const pdfBlob = doc.output('blob');
-            
-            if (navigator.canShare && navigator.userAgent.match(/mobile|android|iphone|ipad/i)) {
-                const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-                if (navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'FinTrack Statement',
-                    }).then(() => {
-                        showToast("Shared PDF successfully!", 'success');
-                    }).catch((error) => {
-                        console.log('Sharing failed, falling back to download', error);
-                        downloadFallback(pdfBlob, filename);
-                    });
-                    return;
-                }
-            }
-            
-            downloadFallback(pdfBlob, filename);
-        }
-
-        function downloadFallback(blob, filename) {
-            try {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 100);
-                showToast("Exported to PDF successfully!", 'success');
-            } catch (err) {
-                console.error("PDF Download error:", err);
-                showToast("Failed to download PDF. Please try again.", 'error');
-            }
-        }
-
         function generateFinancialSummaryText() {
             const currentTxns = getCurrentTransactions();
             const accountName = appData.accounts.find(a => a.id === appData.currentAccountId)?.name || 'Account';
@@ -1473,11 +1308,9 @@
             const debit = amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1;
 
             let text = `FINANCIAL SUMMARY: ${accountName.toUpperCase()}\n`;
-            text += `----------------------------------------\n`;
-            text += `• Total Balance: ${sym}${formatRupees(total)}\n`;
-            text += `• Total Credit (+): ${sym}${formatRupees(credit)}\n`;
-            text += `• Total Debit (-): ${sym}${formatRupees(debit)}\n`;
-            text += `----------------------------------------\n`;
+            text += `Total Balance: ${sym}${formatRupees(total)}\n`;
+            text += `Total Credit (+): ${sym}${formatRupees(credit)}\n`;
+            text += `Total Debit (-): ${sym}${formatRupees(debit)}\n`;
             text += `TRANSACTION HISTORY:\n`;
 
             if (currentTxns.length === 0) {
@@ -1486,11 +1319,11 @@
                 const sorted = [...currentTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
                 sorted.forEach(t => {
                     const sign = t.amount > 0 ? '+' : '-';
-                    const txSym = t.currencySymbol || getCurrencySymbol(t.currencyCode);
+                    const txSym = '₹';
                     text += `[${formatDate(t.date)}] ${t.text} (${t.category}): ${sign}${txSym}${formatRupees(Math.abs(t.amount))}\n`;
                 });
             }
-            text += `----------------------------------------\n`;
+           
             text += `Generated via FinTrack Budget Planner`;
             return text;
         }
@@ -1733,7 +1566,6 @@
                     <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
                         <div class="${barColor} h-1.5 rounded-full transition-all duration-700" style="width: ${percent}%"></div>
                     </div>
-                    ${percent >= 100 ? `<p class="text-xs text-rose-600 mt-2 font-medium">Over budget</p>` : ''}
                 `;
                 list.appendChild(item);
             });
@@ -1743,75 +1575,6 @@
             appData.budgets = appData.budgets.filter(b => b.id !== id);
             updateLocalStorage();
             renderBudgets();
-        }
-
-        function updateCurrencyUI() {
-            const sym = getCurrencySymbol();
-            document.querySelectorAll('.currency-symbol').forEach(el => {
-                el.innerText = sym;
-            });
-        }
-
-        function renderCurrencySelectOptions() {
-            const selectEl = document.getElementById('currency-select');
-            if (!selectEl) return;
-            selectEl.innerHTML = '';
-
-            const allCurr = [...defaultCurrencies, ...(appData.customCurrencies || [])];
-            allCurr.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.code;
-                opt.innerText = `${c.symbol} ${c.name || c.code} (${c.code})`;
-                if (c.code === appData.settings.currency) {
-                    opt.selected = true;
-                }
-                selectEl.appendChild(opt);
-            });
-        }
-
-        function openCurrencyModal() {
-            renderCurrencySelectOptions();
-            document.getElementById('currency-modal').classList.remove('hidden');
-        }
-
-        function closeCurrencyModal() {
-            document.getElementById('currency-modal').classList.add('hidden');
-        }
-
-        function saveCurrency() {
-            const val = document.getElementById('currency-select').value;
-            appData.settings.currency = val;
-            updateLocalStorage();
-            updateCurrencyUI();
-            init();
-            closeCurrencyModal();
-            showToast("Currency updated", 'success');
-        }
-
-        function addCustomCurrency(e) {
-            e.preventDefault();
-            const code = document.getElementById('custom-curr-code').value.trim().toUpperCase();
-            const symbol = document.getElementById('custom-curr-sym').value.trim();
-
-            if (!code || !symbol) return;
-            if (!appData.customCurrencies) appData.customCurrencies = [];
-
-            if (defaultCurrencies.some(c => c.code === code) || appData.customCurrencies.some(c => c.code === code)) {
-                showToast("Currency code already exists.", "error");
-                return;
-            }
-
-            appData.customCurrencies.push({ code, symbol, name: code });
-            appData.settings.currency = code;
-            updateLocalStorage();
-            
-            document.getElementById('custom-curr-code').value = '';
-            document.getElementById('custom-curr-sym').value = '';
-
-            updateCurrencyUI();
-            init();
-            closeCurrencyModal();
-            showToast(`Added and switched to ${symbol} (${code})`, 'success');
         }
 
         function openAddCategoryModal() {
@@ -2059,7 +1822,6 @@
             listEl.innerHTML = '';
             renderAccountSelector();
             renderCategoryOptions();
-            updateCurrencyUI();
 
             let currentTxns = getCurrentTransactions();
             const searchQ = document.getElementById('search-history')?.value.toLowerCase();
