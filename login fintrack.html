@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - FinTrack</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out forwards; }
+        .tab-btn.active { border-bottom: 2px solid #4f46e5; color: #4f46e5; font-weight: 600; }
+        .dark .tab-btn.active { border-bottom: 2px solid #818cf8; color: #818cf8; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex justify-center items-center min-h-screen m-0 p-4 transition-colors duration-300">
+
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col animate-fade-in relative">
+        
+        <!-- Header -->
+        <div class="bg-indigo-600 dark:bg-indigo-900/60 p-6 text-center text-white relative">
+            <div class="w-12 h-12 bg-white/20 rounded-xl mx-auto flex items-center justify-center text-2xl mb-3 backdrop-blur-sm border border-white/30">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight">FinTrack Cloud</h1>
+            <p class="text-xs text-indigo-200 mt-1">Sync your finances across all devices</p>
+        </div>
+
+        <!-- Auth Tabs -->
+        <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+            <button onclick="switchTab('google-tab')" id="btn-google-tab" class="tab-btn active flex-1 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Google</button>
+            <button onclick="switchTab('email-tab')" id="btn-email-tab" class="tab-btn flex-1 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Email</button>
+            <button onclick="switchTab('phone-tab')" id="btn-phone-tab" class="tab-btn flex-1 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Phone</button>
+        </div>
+
+        <div class="p-6 sm:p-8">
+            <div id="auth-error" class="hidden mb-4 p-3 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs rounded-lg border border-rose-200 dark:border-rose-800 text-center font-medium"></div>
+
+            <div id="google-tab" class="tab-content active text-center">
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">Fastest way to securely sync your data.</p>
+                <button id="google-login-btn" class="w-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-600 shadow-sm transition-all flex items-center justify-center gap-3">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                    <span>Sign in with Google</span>
+                </button>
+            </div>
+
+            <div id="email-tab" class="tab-content">
+                <form id="email-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Email Address</label>
+                        <input type="email" id="email-input" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Password</label>
+                        <input type="password" id="password-input" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    </div>
+                    <div class="flex gap-2 pt-2">
+                        <button type="button" id="email-signup-btn" class="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium py-2.5 rounded-lg transition-colors text-sm border border-slate-200 dark:border-slate-700">Create Account</button>
+                        <button type="submit" id="email-signin-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors text-sm">Sign In</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="phone-tab" class="tab-content">
+                <div id="phone-step-1" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Phone Number (with country code)</label>
+                        <input type="tel" id="phone-input" placeholder="+1 234 567 8900" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    </div>
+                    <div id="recaptcha-container" class="flex justify-center my-2"></div>
+                    <button id="send-otp-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors text-sm">Send Verification Code</button>
+                </div>
+
+                <div id="phone-step-2" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Enter 6-digit Code</label>
+                        <input type="text" id="otp-input" placeholder="000000" class="w-full px-3 py-2.5 text-center tracking-widest rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg font-mono">
+                    </div>
+                    <button id="verify-otp-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors text-sm">Verify & Login</button>
+                    <button onclick="resetPhoneAuth()" class="w-full text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium">Go back</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            RecaptchaVerifier,
+            signInWithPhoneNumber,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCHw1pqNBp_NWVrYWi3pMmNuf1evIXj8nE",
+            authDomain: "fintrack-2091d.firebaseapp.com",
+            databaseURL: "https://fintrack-2091d-default-rtdb.firebaseio.com",
+            projectId: "fintrack-2091d",
+            storageBucket: "fintrack-2091d.firebasestorage.app",
+            messagingSenderId: "721465834725",
+            appId: "1:721465834725:web:da300e3a9fb5615db5680c",
+            measurementId: "G-5S0Q0M2D46"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Check if already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = 'FinTrack.html';
+            }
+        });
+
+        // UI Helpers
+        const errorEl = document.getElementById('auth-error');
+        function showError(msg) {
+            errorEl.innerText = msg;
+            errorEl.classList.remove('hidden');
+        }
+        function hideError() {
+            errorEl.classList.add('hidden');
+        }
+
+        window.switchTab = function(tabId) {
+            hideError();
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        // --- 1. GOOGLE AUTH ---
+        document.getElementById('google-login-btn').addEventListener('click', async () => {
+            hideError();
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                // Redirect handled by onAuthStateChanged
+            } catch (error) {
+                showError("Google Sign-In failed: " + error.message);
+            }
+        });
+
+        // --- 2. EMAIL AUTH ---
+        const emailForm = document.getElementById('email-form');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+
+        emailForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Sign In
+            hideError();
+            try {
+                await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+
+        document.getElementById('email-signup-btn').addEventListener('click', async () => {
+            if(!emailInput.value || !passwordInput.value) {
+                showError("Please enter email and password to sign up.");
+                return;
+            }
+            hideError();
+            try {
+                await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+
+        // --- 3. PHONE AUTH ---
+        let confirmationResult = null;
+        
+        // Initialize reCAPTCHA
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'normal',
+            'callback': (response) => {
+                // reCAPTCHA solved
+            }
+        });
+
+        document.getElementById('send-otp-btn').addEventListener('click', async () => {
+            const phoneInput = document.getElementById('phone-input').value;
+            if(!phoneInput) return showError("Enter a valid phone number with country code.");
+            hideError();
+            
+            try {
+                confirmationResult = await signInWithPhoneNumber(auth, phoneInput, window.recaptchaVerifier);
+                document.getElementById('phone-step-1').classList.add('hidden');
+                document.getElementById('phone-step-2').classList.remove('hidden');
+            } catch (error) {
+                showError("Failed to send OTP: " + error.message);
+                window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
+            }
+        });
+
+        document.getElementById('verify-otp-btn').addEventListener('click', async () => {
+            const otp = document.getElementById('otp-input').value;
+            hideError();
+            try {
+                await confirmationResult.confirm(otp);
+            } catch (error) {
+                showError("Invalid Code: " + error.message);
+            }
+        });
+
+        window.resetPhoneAuth = function() {
+            document.getElementById('phone-step-1').classList.remove('hidden');
+            document.getElementById('phone-step-2').classList.add('hidden');
+            hideError();
+        }
+
+        // Apply theme
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body>
+</html>
