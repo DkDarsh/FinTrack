@@ -18,6 +18,7 @@
                     animation: {
                         'slide-in': 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'slide-up-bar': 'slideUpBar 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     },
                     keyframes: {
                         slideIn: {
@@ -27,6 +28,10 @@
                         fadeIn: {
                             '0%': { opacity: '0' },
                             '100%': { opacity: '1' },
+                        },
+                        slideUpBar: {
+                            '0%': { transform: 'translate(-50%, 150%)', opacity: '0' },
+                            '100%': { transform: 'translate(-50%, 0)', opacity: '1' },
                         }
                     }
                 }
@@ -44,6 +49,11 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .health-bar-fill { transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Custom checkbox style for transaction selection */
+        .txn-checkbox:checked {
+            background-color: #4f46e5; /* indigo-600 */
+            border-color: #4f46e5;
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex justify-center items-center min-h-screen m-0 p-0 transition-colors duration-300">
@@ -117,7 +127,7 @@
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 pb-6 z-10 flex flex-col min-h-0 bg-slate-50 dark:bg-slate-900">
+        <div class="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 pb-6 z-10 flex flex-col min-h-0 bg-slate-50 dark:bg-slate-900 relative">
             <div class="sticky top-0 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur py-2 z-10 mb-4 border-b border-slate-200 dark:border-slate-800">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300">Transaction History</h3>
@@ -140,8 +150,29 @@
             </div>
             
             <div class="flex-1 overflow-y-auto">
-                <ul id="list" class="space-y-3 pb-24">
+                <ul id="list" class="space-y-3 pb-32">
                 </ul>
+            </div>
+        </div>
+
+        <!-- Floating Calculator Bar for Selected Transactions -->
+        <div id="calculator-bar" class="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] sm:max-w-[400px] bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur shadow-[0_8px_30px_rgb(0,0,0,0.24)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-slate-700 dark:border-slate-600 p-4 z-[45] transition-all duration-300 transform translate-y-[150%] opacity-0 pointer-events-none rounded-2xl text-white">
+            <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-slate-200" id="calc-selected-count">0 Selected</span>
+                </div>
+                <button onclick="clearSelection()" class="text-xs font-medium bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-300 transition-colors border border-slate-700">Clear</button>
+            </div>
+            <div class="flex justify-between items-end border-b border-slate-700 pb-3 mb-3">
+                <span class="text-xs uppercase font-medium text-slate-400 tracking-wider">Net Selection</span>
+                <span id="calc-net-amount" class="text-2xl font-bold tracking-tight">₹0.00</span>
+            </div>
+            <div class="flex justify-between text-xs">
+                <span class="font-medium text-slate-300">Total Credit: <span id="calc-credit-amount" class="text-emerald-400 ml-1">₹0.00</span></span>
+                <span class="font-medium text-slate-300">Total Debit: <span id="calc-debit-amount" class="text-rose-400 ml-1">₹0.00</span></span>
             </div>
         </div>
 
@@ -495,6 +526,9 @@
         appData.goals = appData.goals || [];
         appData.budgets = appData.budgets || [];
 
+        // State for Selection Calculator
+        let selectedTransactionIds = new Set();
+
         const oldTransactions = JSON.parse(localStorage.getItem('transactions'));
         if (oldTransactions && oldTransactions.length > 0 && (!appData.transactions || appData.transactions.length === 0)) {
             appData.transactions = oldTransactions.map(t => ({...t, accountId: DEFAULT_ACCOUNT_ID}));
@@ -530,6 +564,56 @@
 
         let insightsChartInstance = null;
         let finAiChatHistory = [];
+
+        function handleTransactionSelect(id, isChecked) {
+            if (isChecked) {
+                selectedTransactionIds.add(id);
+            } else {
+                selectedTransactionIds.delete(id);
+            }
+            updateCalculatorBar();
+        }
+
+        function clearSelection() {
+            selectedTransactionIds.clear();
+            document.querySelectorAll('input[id^="checkbox-"]').forEach(cb => cb.checked = false);
+            updateCalculatorBar();
+        }
+
+        function updateCalculatorBar() {
+            const bar = document.getElementById('calculator-bar');
+            
+            if (selectedTransactionIds.size === 0) {
+                bar.classList.add('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
+                bar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                return;
+            }
+
+            bar.classList.remove('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
+            bar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+
+            let selectedCredit = 0;
+            let selectedDebit = 0;
+
+            const currentTxns = getCurrentTransactions();
+            currentTxns.forEach(t => {
+                if (selectedTransactionIds.has(t.id)) {
+                    if (t.amount > 0) selectedCredit += t.amount;
+                    else selectedDebit += Math.abs(t.amount);
+                }
+            });
+
+            const net = selectedCredit - selectedDebit;
+            
+            document.getElementById('calc-selected-count').innerText = `${selectedTransactionIds.size} Selected`;
+            
+            const netAmountEl = document.getElementById('calc-net-amount');
+            netAmountEl.innerText = `${net >= 0 ? '+' : '-'}${getCurrencySymbol()}${formatRupees(Math.abs(net))}`;
+            netAmountEl.className = `text-2xl font-bold tracking-tight ${net >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            
+            document.getElementById('calc-credit-amount').innerText = `+${getCurrencySymbol()}${formatRupees(selectedCredit)}`;
+            document.getElementById('calc-debit-amount').innerText = `-${getCurrencySymbol()}${formatRupees(selectedDebit)}`;
+        }
 
         function openAIAdvisor() {
             document.getElementById('ai-advisor-modal').classList.remove('hidden');
@@ -830,6 +914,7 @@
         function switchAccount() {
             appData.currentAccountId = accountSelectorEl.value;
             updateLocalStorage();
+            clearSelection(); // Clear selections when switching accounts
             init();
         }
 
@@ -984,6 +1069,8 @@
                     txn.tags = tags;
                 }
                 showToast("Transaction updated successfully", 'success');
+                // Ensure calculator updates if modifying a selected transaction
+                if(selectedTransactionIds.has(Number(editId))) updateCalculatorBar();
             } else {
                 const transaction = {
                     id: Math.floor(Math.random() * 100000000),
@@ -1045,6 +1132,7 @@
             const iconStr = getCategoryIcon(transaction.category);
             
             const txSymbol = '₹';
+            const isSelected = selectedTransactionIds.has(transaction.id);
 
             let tagsHTML = '';
             if (transaction.tags && transaction.tags.length > 0) {
@@ -1060,24 +1148,32 @@
                 'border-slate-200', 'dark:border-slate-700', 'group', 'gap-2', 'cursor-pointer', 'hover:border-indigo-300', 'dark:hover:border-indigo-700', 'transition-colors'
             );
             item.onclick = (e) => {
-                if(e.target.closest('button')) return;
+                // Prevent opening view modal if clicking checkbox or its container
+                if(e.target.closest('input[type="checkbox"]') || e.target.closest('.checkbox-container')) return;
                 viewTransaction(transaction.id);
             };
 
             const amountColorClass = isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100';
 
             item.innerHTML = `
-                <div class="flex items-center gap-3 overflow-hidden">
+                <div class="checkbox-container mr-2 flex items-center h-full" onclick="event.stopPropagation()">
+                    <input type="checkbox" 
+                        id="checkbox-${transaction.id}" 
+                        class="txn-checkbox w-[18px] h-[18px] rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors" 
+                        ${isSelected ? 'checked' : ''}
+                        onchange="handleTransactionSelect(${transaction.id}, this.checked)">
+                </div>
+                <div class="flex items-center gap-3 overflow-hidden flex-1">
                     <div class="w-10 h-10 rounded-md bg-slate-50 dark:bg-slate-700 flex justify-center items-center shrink-0 border border-slate-100 dark:border-slate-600">
                         ${iconStr}
                     </div>
-                    <div class="flex flex-col truncate pr-2">
+                    <div class="flex flex-col truncate pr-2 w-full">
                         <p class="font-semibold text-slate-900 dark:text-slate-100 truncate text-sm leading-tight">${transaction.text}</p>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${formatDate(transaction.date)} • <span>${transaction.category}</span></p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">${formatDate(transaction.date)} • <span>${transaction.category}</span></p>
                         ${tagsHTML}
                     </div>
                 </div>
-                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
                     <span class="font-semibold text-sm sm:text-base ${amountColorClass}">
                         ${sign}${txSymbol}${formatRupees(Math.abs(transaction.amount))}
                     </span>
@@ -1133,6 +1229,10 @@
                 "Are you sure you want to delete this transaction? This action cannot be undone.",
                 () => {
                     appData.transactions = appData.transactions.filter(transaction => transaction.id !== id);
+                    if(selectedTransactionIds.has(id)) {
+                        selectedTransactionIds.delete(id);
+                        updateCalculatorBar();
+                    }
                     updateLocalStorage();
                     init();
                     showToast("Transaction deleted successfully.", "success");
@@ -1172,6 +1272,7 @@
                     appData.currentAccountId = DEFAULT_ACCOUNT_ID;
                     
                     updateLocalStorage();
+                    clearSelection();
                     init();
                     showToast("Account deleted successfully.", 'success');
                     closeConfirmModal();
@@ -1188,6 +1289,7 @@
                     () => {
                         appData.transactions = appData.transactions.filter(t => t.accountId !== appData.currentAccountId);
                         updateLocalStorage();
+                        clearSelection();
                         init();
                         showToast("Transaction history cleared.", 'success');
                         closeConfirmModal();
@@ -1837,6 +1939,17 @@
             if (filterDate) {
                 currentTxns = currentTxns.filter(t => t.date === filterDate);
             }
+            
+            // Clean up selections that are no longer visible due to filters
+            const visibleIds = new Set(currentTxns.map(t => t.id));
+            let selectionChanged = false;
+            for(let id of selectedTransactionIds) {
+                if(!visibleIds.has(id)) {
+                    selectedTransactionIds.delete(id);
+                    selectionChanged = true;
+                }
+            }
+            if (selectionChanged) updateCalculatorBar();
 
             const sorted = [...currentTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
             sorted.forEach(addTransactionDOM);
