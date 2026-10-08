@@ -156,23 +156,42 @@
         </div>
 
         <!-- Floating Calculator Bar for Selected Transactions -->
-        <div id="calculator-bar" class="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] sm:max-w-[400px] bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur shadow-[0_8px_30px_rgb(0,0,0,0.24)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.5)] border border-slate-700 dark:border-slate-600 p-4 z-[45] transition-all duration-300 transform translate-y-[150%] opacity-0 pointer-events-none rounded-2xl text-white">
-            <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-calculator"></i>
-                    </div>
-                    <span class="text-sm font-semibold text-slate-200" id="calc-selected-count">0 Selected</span>
+        <div id="calculator-bar" class="fixed bottom-24 left-1/2 -translate-x-1/2 w-fit max-w-[95%] sm:max-w-max bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 p-2 z-[45] transition-all duration-300 ease-out transform translate-y-[150%] opacity-0 pointer-events-none rounded-full flex items-center justify-between gap-3 sm:gap-5">
+            <!-- Left: Count -->
+            <div class="flex items-center gap-2 pl-2">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 shadow-inner">
+                    <i class="fa-solid fa-calculator text-sm"></i>
                 </div>
-                <button onclick="clearSelection()" class="text-xs font-medium bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-300 transition-colors border border-slate-700">Clear</button>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider">Items</span>
+                    <span class="text-sm font-extrabold text-slate-800 dark:text-slate-100 leading-none" id="calc-selected-count">0</span>
+                </div>
             </div>
-            <div class="flex justify-between items-end border-b border-slate-700 pb-3 mb-3">
-                <span class="text-xs uppercase font-medium text-slate-400 tracking-wider">Net Selection</span>
-                <span id="calc-net-amount" class="text-2xl font-bold tracking-tight">₹0.00</span>
+            
+            <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 shrink-0"></div>
+
+            <!-- Center: Net Amount -->
+            <div class="flex flex-col items-center justify-center min-w-[70px] sm:min-w-[90px]">
+                <span class="text-[9px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Net Flow</span>
+                <span id="calc-net-amount" class="text-base sm:text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100 leading-none truncate max-w-[90px] sm:max-w-[120px]">₹0.00</span>
             </div>
-            <div class="flex justify-between text-xs">
-                <span class="font-medium text-slate-300">Total Credit: <span id="calc-credit-amount" class="text-emerald-400 ml-1">₹0.00</span></span>
-                <span class="font-medium text-slate-300">Total Debit: <span id="calc-debit-amount" class="text-rose-400 ml-1">₹0.00</span></span>
+
+            <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 shrink-0"></div>
+
+            <!-- Right: Breakdown & Close -->
+            <div class="flex items-center gap-2 sm:gap-4 pr-1">
+                <div class="flex flex-col gap-1 shrink-0">
+                    <div class="flex items-center justify-between gap-2 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 leading-none">
+                        <i class="fa-solid fa-arrow-up text-[8px]"></i> <span id="calc-credit-amount" class="truncate max-w-[50px] sm:max-w-[70px]">₹0.00</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 text-[10px] font-medium text-rose-600 dark:text-rose-400 leading-none">
+                        <i class="fa-solid fa-arrow-down text-[8px]"></i> <span id="calc-debit-amount" class="truncate max-w-[50px] sm:max-w-[70px]">₹0.00</span>
+                    </div>
+                </div>
+                
+                <button onclick="clearSelection()" class="w-8 h-8 shrink-0 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 transition-colors flex items-center justify-center focus:outline-none" title="Clear Selection">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
         </div>
 
@@ -582,15 +601,28 @@
 
         function updateCalculatorBar() {
             const bar = document.getElementById('calculator-bar');
+            const txList = document.getElementById('list');
             
             if (selectedTransactionIds.size === 0) {
                 bar.classList.add('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
                 bar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                
+                // Restore normal padding when hidden
+                if (txList) {
+                    txList.classList.remove('pb-52');
+                    txList.classList.add('pb-32');
+                }
                 return;
             }
 
             bar.classList.remove('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
             bar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+
+            // Add extra bottom padding so the calculator doesn't cover the last transactions
+            if (txList) {
+                txList.classList.remove('pb-32');
+                txList.classList.add('pb-52');
+            }
 
             let selectedCredit = 0;
             let selectedDebit = 0;
@@ -605,14 +637,14 @@
 
             const net = selectedCredit - selectedDebit;
             
-            document.getElementById('calc-selected-count').innerText = `${selectedTransactionIds.size} Selected`;
+            document.getElementById('calc-selected-count').innerText = selectedTransactionIds.size;
             
             const netAmountEl = document.getElementById('calc-net-amount');
-            netAmountEl.innerText = `${net >= 0 ? '+' : '-'}${getCurrencySymbol()}${formatRupees(Math.abs(net))}`;
-            netAmountEl.className = `text-2xl font-bold tracking-tight ${net >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            netAmountEl.innerText = `${net >= 0 ? '' : '-'}${getCurrencySymbol()}${formatRupees(Math.abs(net))}`;
+            netAmountEl.className = `text-base sm:text-lg font-bold tracking-tight leading-none truncate max-w-[90px] sm:max-w-[120px] ${net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
             
-            document.getElementById('calc-credit-amount').innerText = `+${getCurrencySymbol()}${formatRupees(selectedCredit)}`;
-            document.getElementById('calc-debit-amount').innerText = `-${getCurrencySymbol()}${formatRupees(selectedDebit)}`;
+            document.getElementById('calc-credit-amount').innerText = `${getCurrencySymbol()}${formatRupees(selectedCredit)}`;
+            document.getElementById('calc-debit-amount').innerText = `${getCurrencySymbol()}${formatRupees(selectedDebit)}`;
         }
 
         function openAIAdvisor() {
