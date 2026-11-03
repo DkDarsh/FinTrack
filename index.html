@@ -18,7 +18,6 @@
                     animation: {
                         'slide-in': 'slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'fade-in': 'fadeIn 0.4s ease-out forwards',
-                        'slide-up-bar': 'slideUpBar 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     },
                     keyframes: {
                         slideIn: {
@@ -28,10 +27,6 @@
                         fadeIn: {
                             '0%': { opacity: '0' },
                             '100%': { opacity: '1' },
-                        },
-                        slideUpBar: {
-                            '0%': { transform: 'translate(-50%, 150%)', opacity: '0' },
-                            '100%': { transform: 'translate(-50%, 0)', opacity: '1' },
                         }
                     }
                 }
@@ -49,17 +44,13 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .health-bar-fill { transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        /* Custom checkbox style for transaction selection */
-        .txn-checkbox:checked {
-            background-color: #4f46e5; /* indigo-600 */
-            border-color: #4f46e5;
-        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex justify-center items-center min-h-screen m-0 p-0 transition-colors duration-300">
 
     <div class="w-full h-[100dvh] md:h-[100vh] shadow-none md:shadow-xl overflow-hidden flex flex-col bg-white dark:bg-slate-900 relative border-0 md:border border-slate-200 dark:border-slate-800 transition-colors duration-300">
         
+        <!-- Action Menu -->
         <div class="absolute top-16 right-6 z-[60]">
             <div id="action-menu" class="hidden w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-2 overflow-hidden text-slate-700 dark:text-slate-200 animate-fade-in origin-top-right">
                 <button onclick="toggleTheme(); closeMenu()" class="w-full text-left px-4 py-2 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors"><i id="menu-theme-icon" class="fa-solid fa-moon w-4 text-indigo-500"></i> <span id="menu-theme-text">Dark Mode</span></button>
@@ -73,6 +64,7 @@
             </div>
         </div>
 
+        <!-- Header Area -->
         <div class="bg-indigo-600 dark:bg-slate-950 text-white p-6 pb-10 rounded-b-3xl shadow relative z-20 shrink-0 border-b border-indigo-700 dark:border-slate-800">
             <div class="flex justify-between items-center mb-6">
                 <div class="flex items-center gap-2">
@@ -106,6 +98,7 @@
             </div>
         </div>
 
+        <!-- Income/Expense Summary -->
         <div class="relative z-30 -mt-6 mx-4 sm:mx-6 bg-white dark:bg-slate-800 rounded-xl shadow-md flex p-4 border border-slate-200 dark:border-slate-700 transition-colors duration-300 shrink-0">
             <div class="flex-1 text-center border-r border-slate-200 dark:border-slate-700">
                 <div class="flex items-center justify-center gap-1 mb-1">
@@ -127,6 +120,7 @@
             </div>
         </div>
 
+        <!-- Transactions Container -->
         <div class="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 pb-6 z-10 flex flex-col min-h-0 bg-slate-50 dark:bg-slate-900 relative">
             <div class="sticky top-0 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur py-2 z-10 mb-4 border-b border-slate-200 dark:border-slate-800">
                 <div class="flex justify-between items-center mb-3">
@@ -150,61 +144,52 @@
             </div>
             
             <div class="flex-1 overflow-y-auto">
-                <ul id="list" class="space-y-3 pb-32">
+                <!-- Transactions will be dynamically injected here in grouped lists -->
+                <ul id="list" class="pb-24 transition-all duration-300">
                 </ul>
-            </div>
-        </div>
-
-        <!-- Floating Calculator Bar for Selected Transactions -->
-        <div id="calculator-bar" class="fixed bottom-24 left-1/2 -translate-x-1/2 w-fit max-w-[95%] sm:max-w-max bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 p-2 z-[45] transition-all duration-300 ease-out transform translate-y-[150%] opacity-0 pointer-events-none rounded-full flex items-center justify-between gap-3 sm:gap-5">
-            <!-- Left: Count -->
-            <div class="flex items-center gap-2 pl-2">
-                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 shadow-inner">
-                    <i class="fa-solid fa-calculator text-sm"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span class="text-[9px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider">Items</span>
-                    <span class="text-sm font-extrabold text-slate-800 dark:text-slate-100 leading-none" id="calc-selected-count">0</span>
-                </div>
-            </div>
-            
-            <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 shrink-0"></div>
-
-            <!-- Center: Net Amount -->
-            <div class="flex flex-col items-center justify-center min-w-[70px] sm:min-w-[90px]">
-                <span class="text-[9px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-0.5">Net Flow</span>
-                <span id="calc-net-amount" class="text-base sm:text-lg font-bold tracking-tight text-slate-800 dark:text-slate-100 leading-none truncate max-w-[90px] sm:max-w-[120px]">₹0.00</span>
-            </div>
-
-            <div class="h-8 w-px bg-slate-200 dark:bg-slate-700 shrink-0"></div>
-
-            <!-- Right: Breakdown & Close -->
-            <div class="flex items-center gap-2 sm:gap-4 pr-1">
-                <div class="flex flex-col gap-1 shrink-0">
-                    <div class="flex items-center justify-between gap-2 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 leading-none">
-                        <i class="fa-solid fa-arrow-up text-[8px]"></i> <span id="calc-credit-amount" class="truncate max-w-[50px] sm:max-w-[70px]">₹0.00</span>
-                    </div>
-                    <div class="flex items-center justify-between gap-2 text-[10px] font-medium text-rose-600 dark:text-rose-400 leading-none">
-                        <i class="fa-solid fa-arrow-down text-[8px]"></i> <span id="calc-debit-amount" class="truncate max-w-[50px] sm:max-w-[70px]">₹0.00</span>
-                    </div>
-                </div>
-                
-                <button onclick="clearSelection()" class="w-8 h-8 shrink-0 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-500 dark:text-slate-400 transition-colors flex items-center justify-center focus:outline-none" title="Clear Selection">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
             </div>
         </div>
 
         <button onclick="openAddTransactionModal()" class="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center text-xl transition-transform hover:scale-105 active:scale-95 z-40 focus:outline-none" title="Add Transaction">
             <i class="fa-solid fa-plus"></i>
         </button>
+        
+        <!-- Floating Calculator Bar for Selected Transactions -->
+        <div id="calculator-bar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-white/85 dark:bg-slate-800/85 backdrop-blur-xl border border-slate-200 dark:border-slate-700 shadow-2xl rounded-full px-4 py-3 flex-row items-center gap-4 transition-all duration-500 transform translate-y-24 opacity-0 pointer-events-none w-[90%] max-w-md flex">
+            <div class="flex flex-col items-center justify-center shrink-0 pr-3 border-r border-slate-300 dark:border-slate-600">
+                <span id="calc-count" class="text-lg font-bold text-indigo-600 dark:text-indigo-400 leading-none">0</span>
+                <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Selected</span>
+            </div>
+            
+            <div class="flex-1 flex flex-col items-center justify-center truncate px-2">
+                <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Net Flow</span>
+                <span id="calc-net" class="text-base font-bold text-slate-900 dark:text-white truncate">₹0.00</span>
+            </div>
+
+            <div class="flex flex-col gap-1 shrink-0 pl-3 border-l border-slate-300 dark:border-slate-600">
+                <div class="flex items-center gap-1.5 justify-end">
+                    <i class="fa-solid fa-arrow-up text-[10px] text-emerald-500"></i>
+                    <span id="calc-in" class="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[70px]">₹0.00</span>
+                </div>
+                <div class="flex items-center gap-1.5 justify-end">
+                    <i class="fa-solid fa-arrow-down text-[10px] text-rose-500"></i>
+                    <span id="calc-out" class="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[70px]">₹0.00</span>
+                </div>
+            </div>
+
+            <button onclick="clearSelection()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors ml-1 shrink-0 focus:outline-none">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
     </div>
 
+    <!-- Modals (Toast, Forms, Dialogs) -->
     <div id="toast-msg" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] text-sm font-medium px-4 py-3 rounded-lg shadow-lg flex items-center gap-2">
         <i id="toast-icon" class="fa-solid fa-circle-exclamation"></i>
         <span id="toast-text">Message</span>
     </div>
 
+    <!-- Add/Edit Transaction Modal -->
     <div id="add-transaction-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[90vh] overflow-y-auto relative">
             <div id="ai-loading-overlay" class="absolute inset-0 bg-white/90 dark:bg-slate-800/90 z-10 hidden flex-col items-center justify-center rounded-xl">
@@ -267,6 +252,7 @@
         </div>
     </div>
 
+    <!-- View Transaction Modal -->
     <div id="view-transaction-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-sm w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col">
             <div class="flex justify-between items-center mb-4">
@@ -292,6 +278,7 @@
         </div>
     </div>
 
+    <!-- Goals Modal -->
     <div id="goals-modal" class="fixed inset-0 z-[55] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center mb-4">
@@ -334,6 +321,7 @@
         </div>
     </div>
 
+    <!-- Add Funds Modal -->
     <div id="add-funds-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-xs w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col text-center">
             <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">Allocate Funds</h3>
@@ -352,6 +340,7 @@
         </div>
     </div>
 
+    <!-- Add Category Modal -->
     <div id="add-category-modal" class="fixed inset-0 z-[55] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-sm w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4 shrink-0">Manage Categories</h3>
@@ -368,6 +357,7 @@
         </div>
     </div>
 
+    <!-- Confirm Modal -->
     <div id="confirm-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-sm w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col text-center">
             <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mx-auto mb-4">
@@ -382,6 +372,7 @@
         </div>
     </div>
 
+    <!-- Insights Modal -->
     <div id="insights-modal" class="fixed inset-0 z-[55] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center mb-6">
@@ -408,6 +399,7 @@
         </div>
     </div>
 
+    <!-- Budgets Modal -->
     <div id="budgets-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center mb-4">
@@ -450,6 +442,7 @@
         </div>
     </div>
 
+    <!-- Add Account Modal -->
     <div id="add-account-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-sm w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col">
             <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Add New Account</h3>
@@ -463,6 +456,7 @@
         </div>
     </div>
 
+    <!-- Share Sheet -->
     <div id="share-sheet-modal" class="fixed inset-0 z-[55] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center mb-4">
@@ -491,6 +485,7 @@
         </div>
     </div>
 
+    <!-- AI Advisor Modal -->
     <div id="ai-advisor-modal" class="fixed inset-0 z-[60] bg-slate-900/50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 dark:border-slate-700 animate-slide-in flex flex-col h-[85vh] max-h-[700px]">
             <div class="flex justify-between items-center mb-4 shrink-0">
@@ -522,6 +517,7 @@
         </div>
     </div>
 
+    <!-- Wrapped Modal -->
     <div id="wrapped-modal" class="fixed inset-0 z-[100] bg-slate-900/95 hidden flex items-center justify-center p-4">
         <div id="wrapped-content" class="w-full max-w-sm aspect-[9/16] bg-gradient-to-br from-indigo-700 to-indigo-900 rounded-2xl shadow-xl overflow-hidden relative text-white flex flex-col justify-center items-center text-center p-8 cursor-pointer transform transition-all duration-300 border border-indigo-500/30" onclick="nextWrappedSlide()">
         </div>
@@ -545,9 +541,6 @@
         appData.goals = appData.goals || [];
         appData.budgets = appData.budgets || [];
 
-        // State for Selection Calculator
-        let selectedTransactionIds = new Set();
-
         const oldTransactions = JSON.parse(localStorage.getItem('transactions'));
         if (oldTransactions && oldTransactions.length > 0 && (!appData.transactions || appData.transactions.length === 0)) {
             appData.transactions = oldTransactions.map(t => ({...t, accountId: DEFAULT_ACCOUNT_ID}));
@@ -558,7 +551,6 @@
         const balanceEl = document.getElementById('balance');
         const incomeEl = document.getElementById('money-plus');
         const expenseEl = document.getElementById('money-minus');
-        const listEl = document.getElementById('list');
         const formEl = document.getElementById('form');
         const textEl = document.getElementById('text');
         const amountEl = document.getElementById('amount');
@@ -583,69 +575,86 @@
 
         let insightsChartInstance = null;
         let finAiChatHistory = [];
+        let selectedTransactions = new Set(); // Global Set for selection tracking
 
+        // Helper to toggle monthly groups
+        function toggleMonthGroup(monthKey) {
+            const ul = document.getElementById(`list-${monthKey}`);
+            const icon = document.getElementById(`icon-${monthKey}`);
+            if (ul.classList.contains('hidden')) {
+                ul.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)'; 
+            } else {
+                ul.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)'; 
+            }
+        }
+
+        // Logic for handling individual selection changes
         function handleTransactionSelect(id, isChecked) {
             if (isChecked) {
-                selectedTransactionIds.add(id);
+                selectedTransactions.add(id);
             } else {
-                selectedTransactionIds.delete(id);
+                selectedTransactions.delete(id);
             }
             updateCalculatorBar();
         }
 
+        // Clearing all selections at once
         function clearSelection() {
-            selectedTransactionIds.clear();
-            document.querySelectorAll('input[id^="checkbox-"]').forEach(cb => cb.checked = false);
+            selectedTransactions.clear();
+            document.querySelectorAll('.txn-checkbox').forEach(cb => cb.checked = false);
             updateCalculatorBar();
         }
 
+        // Function that computes totals and shows/hides the pill bar
         function updateCalculatorBar() {
             const bar = document.getElementById('calculator-bar');
-            const txList = document.getElementById('list');
+            const listContainer = document.getElementById('list'); // <ul> wrapper
             
-            if (selectedTransactionIds.size === 0) {
-                bar.classList.add('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
+            if (!bar || !listContainer) return;
+
+            if (selectedTransactions.size === 0) {
+                bar.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
                 bar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
-                
-                // Restore normal padding when hidden
-                if (txList) {
-                    txList.classList.remove('pb-52');
-                    txList.classList.add('pb-32');
-                }
+                listContainer.style.paddingBottom = '6rem'; // Default padding
                 return;
             }
 
-            bar.classList.remove('translate-y-[150%]', 'opacity-0', 'pointer-events-none');
-            bar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            let income = 0;
+            let expense = 0;
 
-            // Add extra bottom padding so the calculator doesn't cover the last transactions
-            if (txList) {
-                txList.classList.remove('pb-32');
-                txList.classList.add('pb-52');
-            }
-
-            let selectedCredit = 0;
-            let selectedDebit = 0;
-
-            const currentTxns = getCurrentTransactions();
-            currentTxns.forEach(t => {
-                if (selectedTransactionIds.has(t.id)) {
-                    if (t.amount > 0) selectedCredit += t.amount;
-                    else selectedDebit += Math.abs(t.amount);
+            selectedTransactions.forEach(id => {
+                const txn = appData.transactions.find(t => t.id === id);
+                if (txn) {
+                    if (txn.amount > 0) income += txn.amount;
+                    else expense += Math.abs(txn.amount);
                 }
             });
 
-            const net = selectedCredit - selectedDebit;
+            const net = income - expense;
+            const netSign = net < 0 ? '-' : (net > 0 ? '+' : '');
             
-            document.getElementById('calc-selected-count').innerText = selectedTransactionIds.size;
+            document.getElementById('calc-count').innerText = selectedTransactions.size;
             
-            const netAmountEl = document.getElementById('calc-net-amount');
-            netAmountEl.innerText = `${net >= 0 ? '' : '-'}${getCurrencySymbol()}${formatRupees(Math.abs(net))}`;
-            netAmountEl.className = `text-base sm:text-lg font-bold tracking-tight leading-none truncate max-w-[90px] sm:max-w-[120px] ${net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
+            const netEl = document.getElementById('calc-net');
+            netEl.innerText = `${netSign}₹${formatRupees(Math.abs(net))}`;
             
-            document.getElementById('calc-credit-amount').innerText = `${getCurrencySymbol()}${formatRupees(selectedCredit)}`;
-            document.getElementById('calc-debit-amount').innerText = `${getCurrencySymbol()}${formatRupees(selectedDebit)}`;
+            if (net > 0) netEl.className = 'text-base font-bold text-emerald-600 dark:text-emerald-400 truncate';
+            else if (net < 0) netEl.className = 'text-base font-bold text-rose-600 dark:text-rose-400 truncate';
+            else netEl.className = 'text-base font-bold text-slate-900 dark:text-white truncate';
+
+            document.getElementById('calc-in').innerText = `₹${formatRupees(income)}`;
+            document.getElementById('calc-out').innerText = `₹${formatRupees(expense)}`;
+
+            // Show calculator bar (using transforms rather than hidden for animation)
+            bar.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            bar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            
+            // Allow user to scroll below calculator bar
+            listContainer.style.paddingBottom = '12rem'; 
         }
+
 
         function openAIAdvisor() {
             document.getElementById('ai-advisor-modal').classList.remove('hidden');
@@ -946,7 +955,7 @@
         function switchAccount() {
             appData.currentAccountId = accountSelectorEl.value;
             updateLocalStorage();
-            clearSelection(); // Clear selections when switching accounts
+            clearSelection(); // Reset calc on account swap
             init();
         }
 
@@ -1101,8 +1110,6 @@
                     txn.tags = tags;
                 }
                 showToast("Transaction updated successfully", 'success');
-                // Ensure calculator updates if modifying a selected transaction
-                if(selectedTransactionIds.has(Number(editId))) updateCalculatorBar();
             } else {
                 const transaction = {
                     id: Math.floor(Math.random() * 100000000),
@@ -1158,13 +1165,12 @@
             return '<i class="fa-solid fa-tag text-slate-400"></i>';
         }
 
-        function addTransactionDOM(transaction) {
+        function addTransactionDOM(transaction, container) {
             const isCredit = transaction.amount > 0;
             const sign = isCredit ? '+' : '-';
             const iconStr = getCategoryIcon(transaction.category);
             
             const txSymbol = '₹';
-            const isSelected = selectedTransactionIds.has(transaction.id);
 
             let tagsHTML = '';
             if (transaction.tags && transaction.tags.length > 0) {
@@ -1173,35 +1179,34 @@
                     `</div>`;
             }
 
+            const isSelected = selectedTransactions.has(transaction.id);
+
             const item = document.createElement('li');
             item.classList.add(
                 'animate-slide-in', 'bg-white', 'dark:bg-slate-800', 'rounded-lg', 'p-4',
                 'flex', 'justify-between', 'items-center', 'shadow-sm', 'border', 
                 'border-slate-200', 'dark:border-slate-700', 'group', 'gap-2', 'cursor-pointer', 'hover:border-indigo-300', 'dark:hover:border-indigo-700', 'transition-colors'
             );
+            
             item.onclick = (e) => {
-                // Prevent opening view modal if clicking checkbox or its container
-                if(e.target.closest('input[type="checkbox"]') || e.target.closest('.checkbox-container')) return;
+                if(e.target.closest('button') || e.target.closest('input[type="checkbox"]')) return;
                 viewTransaction(transaction.id);
             };
 
             const amountColorClass = isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100';
 
             item.innerHTML = `
-                <div class="checkbox-container mr-2 flex items-center h-full" onclick="event.stopPropagation()">
-                    <input type="checkbox" 
-                        id="checkbox-${transaction.id}" 
-                        class="txn-checkbox w-[18px] h-[18px] rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer transition-colors" 
-                        ${isSelected ? 'checked' : ''}
-                        onchange="handleTransactionSelect(${transaction.id}, this.checked)">
-                </div>
-                <div class="flex items-center gap-3 overflow-hidden flex-1">
-                    <div class="w-10 h-10 rounded-md bg-slate-50 dark:bg-slate-700 flex justify-center items-center shrink-0 border border-slate-100 dark:border-slate-600">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <input type="checkbox" class="txn-checkbox w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:ring-offset-slate-800 focus:ring-2 dark:bg-slate-700 dark:border-slate-600 cursor-pointer shrink-0" 
+                           ${isSelected ? 'checked' : ''} 
+                           onchange="handleTransactionSelect(${transaction.id}, this.checked)">
+                           
+                    <div class="w-10 h-10 rounded-md bg-slate-50 dark:bg-slate-700 flex justify-center items-center shrink-0 border border-slate-100 dark:border-slate-600 ml-1">
                         ${iconStr}
                     </div>
-                    <div class="flex flex-col truncate pr-2 w-full">
+                    <div class="flex flex-col truncate pr-2">
                         <p class="font-semibold text-slate-900 dark:text-slate-100 truncate text-sm leading-tight">${transaction.text}</p>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">${formatDate(transaction.date)} • <span>${transaction.category}</span></p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${formatDate(transaction.date)} • <span>${transaction.category}</span></p>
                         ${tagsHTML}
                     </div>
                 </div>
@@ -1212,10 +1217,10 @@
                 </div>
             `;
             
-            listEl.prepend(item);
+            container.appendChild(item);
         }
 
-        function updateValues() {
+        function updateValues(filteredTxns) {
             const currentTxns = getCurrentTransactions();
             const amounts = currentTxns.map(t => t.amount);
             
@@ -1239,9 +1244,10 @@
             else if(ratio < 70) healthBarEl.className = 'health-bar-fill bg-yellow-500 h-1.5 rounded-full';
             else healthBarEl.className = 'health-bar-fill bg-emerald-500 h-1.5 rounded-full';
 
-            if (currentTxns.length === 0) {
+            const listEl = document.getElementById('list');
+            if (filteredTxns.length === 0 && listEl) {
                 listEl.innerHTML = `
-                    <div id="empty-state" class="text-center py-12 flex flex-col items-center justify-center h-full animate-fade-in">
+                    <div id="empty-state" class="text-center py-12 flex flex-col items-center justify-center h-full animate-fade-in w-full">
                         <div class="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
                             <i class="fa-solid fa-receipt text-slate-400 dark:text-slate-500"></i>
                         </div>
@@ -1249,9 +1255,6 @@
                         <p class="text-xs text-slate-500 mt-1">Your transaction history will appear here.</p>
                     </div>
                 `;
-            } else {
-                const emptyState = document.getElementById('empty-state');
-                if (emptyState) emptyState.remove();
             }
         }
 
@@ -1261,10 +1264,6 @@
                 "Are you sure you want to delete this transaction? This action cannot be undone.",
                 () => {
                     appData.transactions = appData.transactions.filter(transaction => transaction.id !== id);
-                    if(selectedTransactionIds.has(id)) {
-                        selectedTransactionIds.delete(id);
-                        updateCalculatorBar();
-                    }
                     updateLocalStorage();
                     init();
                     showToast("Transaction deleted successfully.", "success");
@@ -1953,14 +1952,22 @@
         }
 
         function init() {
+            const listEl = document.getElementById('list');
+            if (!listEl) return;
+            
+            // Clear current list content
             listEl.innerHTML = '';
             renderAccountSelector();
             renderCategoryOptions();
 
             let currentTxns = getCurrentTransactions();
-            const searchQ = document.getElementById('search-history')?.value.toLowerCase();
-            const filterDate = document.getElementById('filter-date')?.value;
+            const searchInput = document.getElementById('search-history');
+            const dateInput = document.getElementById('filter-date');
+            
+            const searchQ = searchInput ? searchInput.value.toLowerCase() : '';
+            const filterDate = dateInput ? dateInput.value : '';
 
+            // Apply Filters
             if (searchQ) {
                 currentTxns = currentTxns.filter(t => 
                     t.text.toLowerCase().includes(searchQ) || 
@@ -1972,20 +1979,60 @@
                 currentTxns = currentTxns.filter(t => t.date === filterDate);
             }
             
-            // Clean up selections that are no longer visible due to filters
-            const visibleIds = new Set(currentTxns.map(t => t.id));
+            // Clean up selections that are no longer visible due to filters or deletions
             let selectionChanged = false;
-            for(let id of selectedTransactionIds) {
-                if(!visibleIds.has(id)) {
-                    selectedTransactionIds.delete(id);
+            selectedTransactions.forEach(id => {
+                if (!currentTxns.find(t => t.id === id)) {
+                    selectedTransactions.delete(id);
                     selectionChanged = true;
                 }
-            }
+            });
             if (selectionChanged) updateCalculatorBar();
 
             const sorted = [...currentTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
-            sorted.forEach(addTransactionDOM);
-            updateValues();
+            
+            // Group transactions by month
+            const grouped = {};
+            sorted.forEach(t => {
+                const monthKey = t.date.substring(0, 7); // Extract YYYY-MM
+                if (!grouped[monthKey]) grouped[monthKey] = [];
+                grouped[monthKey].push(t);
+            });
+
+            if (Object.keys(grouped).length > 0) {
+                for (const [monthKey, txns] of Object.entries(grouped)) {
+                    const parts = monthKey.split('-');
+                    const d = new Date(parts[0], parts[1] - 1, 1);
+                    const monthLabel = d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+                    
+                    const groupLi = document.createElement('li');
+                    groupLi.className = 'mb-5 list-none w-full block';
+                    
+                    const headerBtn = document.createElement('button');
+                    headerBtn.className = 'w-full flex justify-between items-center bg-slate-100 dark:bg-slate-800 px-4 py-2.5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 font-semibold text-slate-800 dark:text-slate-200 text-sm focus:outline-none transition-colors hover:bg-slate-200 dark:hover:bg-slate-700/80 mb-2';
+                    headerBtn.onclick = () => toggleMonthGroup(monthKey);
+                    headerBtn.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span>${monthLabel}</span>
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">${txns.length}</span>
+                        </div>
+                        <i id="icon-${monthKey}" class="fa-solid fa-chevron-down text-slate-500 transition-transform duration-300" style="transform: rotate(180deg);"></i>
+                    `;
+                    
+                    const ul = document.createElement('ul');
+                    ul.id = `list-${monthKey}`;
+                    ul.className = 'space-y-3 transition-all duration-300 origin-top flex flex-col w-full';
+                    
+                    txns.forEach(t => addTransactionDOM(t, ul));
+                    
+                    groupLi.appendChild(headerBtn);
+                    groupLi.appendChild(ul);
+                    listEl.appendChild(groupLi);
+                }
+            }
+
+            // Update top values and handle Empty state HTML if length is 0
+            updateValues(currentTxns);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -2010,6 +2057,7 @@
                     
                     renderAccountSelector();
                     closeAddAccountModal();
+                    clearSelection();
                     init();
                     showToast(`Account "${name}" created.`, 'success');
                 });
